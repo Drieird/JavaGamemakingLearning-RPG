@@ -45,48 +45,57 @@ public class GamePanel extends JPanel implements Runnable{
     @Override
     public void run() {
         
-        double drawInterval = 1000000000/FPS;
-        double nextDrawTime = System.nanoTime() + drawInterval;
+        double drawInterval = 1000000000/FPS;// 1 frame every 16.666 nanoseconds or 0,016666 seconds
+        double delta = 0;
+        long lastTime = System.nanoTime();
+        long currentTime;
+        long timer = 0;
+        int frameCount = 0;
         
         while(gameThread != null) {
+            currentTime = System.nanoTime();
+            delta += (currentTime - lastTime) / drawInterval;
+            timer += currentTime - lastTime;
+            lastTime = currentTime;
             
-            update();
-
-            repaint();
-            
-            
-            try {
-                double remainingTime = nextDrawTime - System.nanoTime();
-                remainingTime = remainingTime/1000000;
-                
-                if(remainingTime < 0) {
-                    remainingTime = 0;
-                }
-                
-                Thread.sleep((long) remainingTime);
-                
-                nextDrawTime += drawInterval;
-                
-            } catch (InterruptedException e){
-                e.printStackTrace();
+            if(delta >=1) {
+                update();
+                repaint(); 
+                delta--;
+                frameCount++;
             }
-        
+            
+            if(timer >= 1000000000){
+                System.out.println("FPS : "+ frameCount);
+                frameCount = 0;
+                timer = 0;
+            }
         }
     }
     
     public void update() {
 
-        if(keyH.upKeyPressed == true) {
-            playerY -= playerSpd;
+        if(keyH.upKeyPressed || keyH.downKeyPressed == true) {
+            if(keyH.upKeyPressed && keyH.downKeyPressed) {
+                playerY += (playerSpd-playerSpd);
+            }
+            else if(keyH.downKeyPressed) {
+                playerY += playerSpd;
+            }
+            else if(keyH.upKeyPressed) {
+                playerY -= playerSpd;
+            }
         }
-        else if(keyH.leftKeyPressed == true) {
-            playerX -= playerSpd;
-        }
-        else if(keyH.downKeyPressed == true) {
-            playerY += playerSpd;
-        }
-        else if(keyH.rightKeyPressed == true) {
-            playerX += playerSpd;
+        else if(keyH.leftKeyPressed || keyH.rightKeyPressed == true) {
+            if(keyH.leftKeyPressed && keyH.rightKeyPressed) {
+                playerX += (playerSpd-playerSpd);
+            }
+            else if(keyH.rightKeyPressed) {
+                playerX += playerSpd;
+            }
+            else if(keyH.leftKeyPressed) {
+                playerX -= playerSpd;
+            }
         }
     }
     
