@@ -46,5 +46,4 @@ public class KeyHandler implements KeyListener{
             rightKeyPressed = false;
         }
     }
-    
 }
